@@ -1,0 +1,963 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/flag.png">
+  <link rel="icon" href="/img/flag.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="HuShanzhi">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="1 什么是VMC VMC是一种直觉控制方式，其核心思想是利用假想的虚拟构件(如弹簧、阻尼器、轴承等等)连接机器人内部作用点，或者连接作用点与外部环境，产生相应的虚拟力来“驱使”机器人实现期望的运动。这些虚拟力通过 Jacobian 矩阵计算得到期望的关节力矩，作为关节控制的输入，驱动机器人运动以产生和虚拟构件一样的作用效果。VMC的应用关键在于两点：一是在每个需要控制的自由度上构造恰当的虚拟构件以">
+<meta property="og:type" content="article">
+<meta property="og:title" content="虚拟模型控制">
+<meta property="og:url" content="https://hushanzhi.github.io/2023/05/07/%E8%99%9A%E6%8B%9F%E6%A8%A1%E5%9E%8B%E6%8E%A7%E5%88%B6/index.html">
+<meta property="og:site_name" content="恒心居">
+<meta property="og:description" content="1 什么是VMC VMC是一种直觉控制方式，其核心思想是利用假想的虚拟构件(如弹簧、阻尼器、轴承等等)连接机器人内部作用点，或者连接作用点与外部环境，产生相应的虚拟力来“驱使”机器人实现期望的运动。这些虚拟力通过 Jacobian 矩阵计算得到期望的关节力矩，作为关节控制的输入，驱动机器人运动以产生和虚拟构件一样的作用效果。VMC的应用关键在于两点：一是在每个需要控制的自由度上构造恰当的虚拟构件以">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://hushanzhi.github.io/img/%E8%99%9A%E6%8B%9F%E6%A8%A1%E5%9E%8B%E6%8E%A7%E5%88%B6/%E4%B8%89%E8%87%AA%E7%94%B1%E5%BA%A6%E6%9C%BA%E6%A2%B0%E8%87%82%E7%AE%80%E5%8C%96%E6%A8%A1%E5%9E%8B.png">
+<meta property="og:image" content="https://hushanzhi.github.io/img/%E8%99%9A%E6%8B%9F%E6%A8%A1%E5%9E%8B%E6%8E%A7%E5%88%B6/MDH%E6%B3%95%E5%BB%BA%E7%AB%8B%E5%9D%90%E6%A0%87%E7%B3%BB.png">
+<meta property="article:published_time" content="2023-05-07T13:19:01.000Z">
+<meta property="article:modified_time" content="2023-05-10T14:19:26.155Z">
+<meta property="article:author" content="HuShanzhi">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://hushanzhi.github.io/img/%E8%99%9A%E6%8B%9F%E6%A8%A1%E5%9E%8B%E6%8E%A7%E5%88%B6/%E4%B8%89%E8%87%AA%E7%94%B1%E5%BA%A6%E6%9C%BA%E6%A2%B0%E8%87%82%E7%AE%80%E5%8C%96%E6%A8%A1%E5%9E%8B.png">
+  
+  
+  
+  <title>虚拟模型控制 - 恒心居</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"hushanzhi.github.io","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>恒心居</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/banner.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="虚拟模型控制"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2023-05-07 21:19" pubdate>
+          2023年5月7日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          5.9k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          49 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">虚拟模型控制</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h2 id="什么是vmc">1 什么是VMC</h2>
+<p>VMC是一种直觉控制方式，其核心思想是利用假想的虚拟构件(如弹簧、阻尼器、轴承等等)连接机器人内部作用点，或者连接作用点与外部环境，产生相应的虚拟力来“驱使”机器人实现期望的运动。这些虚拟力通过
+Jacobian
+矩阵计算得到期望的关节力矩，作为关节控制的输入，驱动机器人运动以产生和虚拟构件一样的作用效果。<strong>VMC的应用关键在于两点：一是在每个需要控制的自由度上构造恰当的虚拟构件以产生合适的虚拟力；二是在不同的相位状态利用相应的
+Jacobian 矩阵计算期望的关节力矩。</strong></p>
+<h3 id="雅可比矩阵">1.1 雅可比矩阵</h3>
+<p>虚拟力不是实际存在的作用力或力矩，机器人的运动最终是通过关节力矩实现的。为了将工作空间(Task
+Space)的力或力矩映射成关节空间(Joint
+Space)的关节力矩，需要先求得这两个空间的位置映射关系，即正运动学模型：
+<span class="math display">\[
+\pmb{x} = f(\pmb{q}) \tag{1}
+\]</span> 其中，<span class="math inline">\(\pmb{x} = [x_1\ x_2 \ ...
+x_m]^T\)</span> 为机体坐标系相对于地面坐标系的<span
+class="math inline">\(m\)</span>个自由度对应的位姿向量，<span
+class="math inline">\(\pmb{q} = [q_1 \ q_2 \ ... q_n]^T\)</span> 为<span
+class="math inline">\(n\)</span>个关节变量的位置向量。对式 （1），分别求
+<span class="math inline">\(\pmb{x}\)</span> 对 <span
+class="math inline">\(\pmb{q}\)</span> 的偏导数得： <span
+class="math display">\[
+\begin{cases}
+\delta x_1 = \frac{\partial f1}{\partial q_1} \delta q1 + \ ... +
+\frac{\partial f1}{\partial q_n} \delta qn \\
+\vdots \\
+\delta x_m = \frac{\partial fm}{\partial q_1} \delta q1 + \ ... +
+\frac{\partial fm}{\partial q_n} \delta qn\\
+\end{cases}
+\tag{2}
+\]</span> 即 <span class="math display">\[
+\delta \pmb{x} =  
+\begin{bmatrix}
+\frac{\partial f1}{\partial q_1}&amp;...&amp;\frac{\partial f1}{\partial
+q_n} \\
+\vdots&amp;\ddots&amp;\vdots\\
+\frac{\partial fm}{\partial q_1}&amp;...&amp;\frac{\partial fm}{\partial
+q_n} \\
+\end{bmatrix}
+\delta \pmb{q}
+\tag{3}
+\]</span> 可简写为 <span class="math display">\[
+\delta \pmb{x}_{(m,1)} = \pmb{J}_{(m,n)} \cdot \delta \pmb{q}_{(n,1)}
+\tag{4}
+\]</span> <span class="math inline">\(\pmb{J}_{(m,n)}\)</span>
+即为雅可比矩阵，它可以将关节速度 <span
+class="math inline">\(\dot{q}\)</span> 映射成机体位姿速度 <span
+class="math inline">\(\dot{x}\)</span>。</p>
+<h3 id="外部作用力和关节力矩的关系">1.2 外部作用力和关节力矩的关系</h3>
+<blockquote>
+<p>虚功原理：</p>
+</blockquote>
+<p>根据虚功原理，可得： <span class="math display">\[
+\pmb{\tau}^T \delta \pmb{q} + (-\pmb{F})^T\delta \pmb{x} = 0
+\tag{5}
+\]</span></p>
+<p>其中，<span class="math inline">\(\pmb{\tau} = [\tau_1\ \tau_2 \ ...
+\tau_n]^T\)</span> 为关节力矩列向量，<span
+class="math inline">\(\pmb{F}=[F_1 \ F_2 \ ... F_m]^T\)</span>
+为外部作用力。根据式（4）、（5）可得外部作用力和关节力矩之间的关系为：</p>
+<p><span class="math display">\[
+\pmb{\tau} = \pmb{J}^T \pmb{F}
+\tag{6}
+\]</span></p>
+<p>其中，<span class="math inline">\(\pmb{J}\)</span> 为雅可比矩阵。</p>
+<h2 id="示例">2 示例</h2>
+<h3 id="三自由度机械手臂腿利用-vmc-进行追点">2.1
+三自由度机械手臂（腿）利用 VMC 进行追点</h3>
+<h4 id="机器人环境">2.1.1 机器人环境</h4>
+<p>采用<code>nyu_finger</code>机器人，该机器人来自于项目<a
+target="_blank" rel="noopener" href="https://github.com/open-dynamic-robot-initiative/nyu_finger">ODRI
+/ nyu_finger</a>。可以将<code>nyu_finger</code>
+简化为为一个三自由度机械臂模型，如下所示：</p>
+<figure>
+<img src="/img/虚拟模型控制/三自由度机械臂简化模型.png" srcset="/img/loading.gif" lazyload
+alt="图1 三自由度机械臂简化模型" />
+<figcaption aria-hidden="true">图1 三自由度机械臂简化模型</figcaption>
+</figure>
+<h4 id="正运动学">2.1.2 正运动学</h4>
+<p>首先要求解三自由度机械手臂的正运动学公式，方法如下：</p>
+<ul>
+<li>采用 MDH 法（又称克雷格法）建立坐标系（【注】原论文采用的是 DH
+法），如下所示：</li>
+</ul>
+<figure>
+<img src="/img/虚拟模型控制/MDH法建立坐标系.png" srcset="/img/loading.gif" lazyload
+alt="图2 MDH法建立坐标系" />
+<figcaption aria-hidden="true">图2 MDH法建立坐标系</figcaption>
+</figure>
+<ul>
+<li><p>建立机器人的连杆参数表；</p>
+<table>
+<thead>
+<tr class="header">
+<th><span class="math inline">\(i\)</span></th>
+<th><span class="math inline">\(\alpha_{i-1}\)</span></th>
+<th><span class="math inline">\(a_{i-1}\)</span></th>
+<th><span class="math inline">\(d_i\)</span></th>
+<th><span class="math inline">\(\theta_{i}\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td><span class="math inline">\(\theta_1\)</span></td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td><span class="math inline">\(-\pi/2\)</span></td>
+<td>0</td>
+<td><span class="math inline">\(D_2\)</span></td>
+<td><span class="math inline">\(\theta_2\)</span></td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>0</td>
+<td><span class="math inline">\(L_2\)</span></td>
+<td><span class="math inline">\(D_3\)</span></td>
+<td><span class="math inline">\(\theta_3\)</span></td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>0</td>
+<td><span class="math inline">\(L_3\)</span></td>
+<td>0</td>
+<td>0</td>
+</tr>
+</tbody>
+</table></li>
+<li><p>求末坐标系和初坐标系之间得变换矩阵 <span
+class="math inline">\(^0_4T\)</span></p>
+<blockquote>
+<p>两个相邻坐标系之间的变换矩阵通式为： <span class="math display">\[
+^{i-1}_iT =
+\begin{bmatrix}
+cos\theta_i&amp;-sin\theta_i&amp;0&amp;a_{i-1}\\
+cos\alpha_{i-1} sin\theta_i&amp;cos\alpha_{i-1}
+cos\theta_i&amp;-sin\alpha_{i-1} &amp;-d_isin\alpha_{i-1} \\
+sin\alpha_{i-1} sin\theta_i&amp;sin\alpha_{i-1}
+cos\theta_i&amp;cos\alpha_{i-1} &amp;d_icos\alpha_{i-1} \\
+0&amp;0&amp;0&amp;1\\
+\end{bmatrix} \\
+\tag{7}
+\]</span></p>
+</blockquote>
+<p>首先，根据式（7），求出所有的两个相邻坐标系之间的变换矩阵为： <span
+class="math display">\[
+^0_1T =
+\begin{bmatrix}
+cos\theta_1&amp;-sin\theta_1&amp;0&amp;0\\
+sin\theta_1&amp;cos\theta_1&amp;0 &amp;0 \\
+0 &amp;0 &amp;1 &amp;0 \\
+0 &amp;0 &amp;0 &amp;1\\
+\end{bmatrix} \\
+\tag{8}
+\]</span></p>
+<p><span class="math display">\[
+^1_2T =
+\begin{bmatrix}
+cos\theta_2&amp;-sin\theta_2&amp;0&amp;0\\
+0 &amp;0 &amp;1 &amp;D_2\\
+-sin\theta_2 &amp;-cos\theta_2 &amp;0 &amp;0 \\
+0 &amp;0 &amp;0 &amp;1\\
+\end{bmatrix} \\
+  \tag{9}
+\]</span></p>
+<p><span class="math display">\[
+^2_3T =
+\begin{bmatrix}
+cos\theta_3&amp;-sin\theta_3&amp;0&amp;L_2\\
+sin\theta_3&amp;cos\theta_3&amp;0 &amp;0 \\
+0 &amp;0 &amp;1 &amp;D_3 \\
+0 &amp;0 &amp;0 &amp;1\\
+\end{bmatrix} \\
+\tag{10}
+\]</span></p>
+<p><span class="math display">\[
+^3_4T =
+\begin{bmatrix}
+1 &amp;0 &amp;0 &amp;L_3\\
+0 &amp;1 &amp;0 &amp;0 \\
+0 &amp;0 &amp;1 &amp;0 \\
+0 &amp;0 &amp;0 &amp;1\\
+\end{bmatrix} \\
+\tag{11}
+\]</span></p>
+<p>然后，将上述变换矩阵累乘得： <span class="math display">\[
+^0_4T = ^0_1T ^1_2T^2_3T^3_4T \\
+=
+\begin{bmatrix}
+c_1c_{23} &amp;-c_1s_{23} &amp;-s_1
+&amp;c_1(L_2c_2+L_3c_{23})-s_1(D_2+D_3)\\
+s_1c_{23} &amp;-s_1s_{23} &amp;c_1
+&amp;s_1(L_2c_2+L_3c_{23})+c_1(D_2+D_3) \\
+-s_{23} &amp;-c_{23} &amp;0 &amp;-L_2s_2-L_3s_{23} \\
+0 &amp;0 &amp;0 &amp;1\\
+\end{bmatrix} \\
+\tag{12}
+\]</span></p>
+<blockquote>
+<p>【注】<span class="math inline">\(c_1\)</span> 为 <span
+class="math inline">\(cos\theta_1\)</span>的简写，<span
+class="math inline">\(c_{23}\)</span> 为 <span
+class="math inline">\(cos(\theta_2+\theta_3)\)</span>的简写，其余类似。</p>
+</blockquote></li>
+<li><p>求末端点在0号坐标系中的表示</p>
+<p>根据式（12），在0号坐标系表示末端点（4号坐标系的原点）为 <span
+class="math display">\[
+^0P_{origin_4} =
+\begin{bmatrix}
+c_1(L_2c_2+L_3c_{23})-s_1(D_2+D_3)\\
+s_1(L_2c_2+L_3c_{23})+c_1(D_2+D_3) \\
+-L_2s_2-L_3s_{23} \\
+\end{bmatrix} \\
+\tag{13}
+\]</span></p>
+<p>式（13）即为式（1）描述的正运动学模型 <span
+class="math inline">\(\pmb{x} = f(\pmb{q}) \tag{1}\)</span>，其中，<span
+class="math inline">\(\pmb{x} =\ ^0P_{origin_4}=  [^0x_{origin_4}\
+^0y_{origin_4}\ ^0z_{origin_4}]^T\)</span>，<span
+class="math inline">\(\pmb{q} = [\theta_1 \ \theta_2 \
+\theta_3]^T\)</span> 。</p></li>
+</ul>
+<p><em>当然，上述矩阵的求解没有人会希望通过手算来解决，可以利用matlab写一个简单脚本进行计算：</em></p>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs matlab"><span class="hljs-comment">% 用于生成变换矩阵.</span><br><span class="hljs-comment">% @filename: generate_T.m</span><br><span class="hljs-comment">% @functionname: generate_T</span><br><span class="hljs-comment">% @args: </span><br><span class="hljs-comment">%   alpha, a, d, theta.</span><br><span class="hljs-comment">% @return:</span><br><span class="hljs-comment">%   T.</span><br><br><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">T</span> = <span class="hljs-title">generate_T</span><span class="hljs-params">(alpha, a, d, theta)</span></span><br><span class="hljs-comment">% 这里的T矩阵是式（7）的矩阵</span><br>T = [<span class="hljs-built_in">cos</span>(theta) -<span class="hljs-built_in">sin</span>(theta) <span class="hljs-number">0</span> a;<br>     <span class="hljs-built_in">cos</span>(alpha)*<span class="hljs-built_in">sin</span>(theta) <span class="hljs-built_in">cos</span>(alpha)*<span class="hljs-built_in">cos</span>(theta) -<span class="hljs-built_in">sin</span>(alpha) -d*<span class="hljs-built_in">sin</span>(alpha);<br>     <span class="hljs-built_in">sin</span>(alpha)*<span class="hljs-built_in">sin</span>(theta) <span class="hljs-built_in">sin</span>(alpha)*<span class="hljs-built_in">cos</span>(theta) <span class="hljs-built_in">cos</span>(alpha) d*<span class="hljs-built_in">cos</span>(alpha);<br>     <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">1</span>];<br><br></code></pre></td></tr></table></figure>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs matlab"><span class="hljs-comment">% 1. 计算末坐标系相对于初坐标系的变换矩阵</span><br><span class="hljs-comment">% 2. 在初坐标系中描述末坐标系的原点</span><br><span class="hljs-comment">% @filename: mian.m</span><br><br>clc,clear,close all;<br>syms th1 th2 th3;<br>syms l1 l2 l3;<br>syms d1 d2 d3;<br>syms PI;<br><br>T01 = generate_T(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, th1);<br>T12 = generate_T(-PI/<span class="hljs-number">2</span>, <span class="hljs-number">0</span>, d2, th2);<br>T23 = generate_T(<span class="hljs-number">0</span>, l2, d3, th3);<br>T34 = generate_T(<span class="hljs-number">0</span>, l3, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>);<br><br>P = T01*T12*T23*T34;<br>P = subs(P,PI,<span class="hljs-built_in">pi</span>); <span class="hljs-comment">% For solving the problem: cos(pi/2) != 0.</span><br>P_simplify = simplify(P)<br><br>pos = P_simplify(<span class="hljs-number">1</span>:<span class="hljs-number">3</span>, <span class="hljs-number">4</span>)<br><br><span class="hljs-comment">% jacobian(pos, [th1, th2, th3])</span><br><br></code></pre></td></tr></table></figure>
+<h4 id="求雅可比矩阵">2.1.3 求雅可比矩阵</h4>
+<p>根据式（2）对式（13）求偏导得： <span class="math display">\[
+\delta \pmb{x} =  
+\begin{bmatrix}
+-s_1(L_2c_2+L_3c_{23})-c_1(D_2+D_3) &amp;-c_1(L_2s_2+L_3s_{23})
+&amp;-L_3c_1s_{23}\\
+c_1(L_2c_2+L_3c_{23})-s_1(D_2+D_3) &amp;-s_1(L_2s_2+L_3s_{23})
+&amp;-L_3s_1s_{23}\\
+0 &amp;-L_2c_2-L_3c_{23} &amp;-L_3c_{23}\\
+\end{bmatrix}
+\delta \pmb{q}
+\tag{14}
+\]</span></p>
+<p>由式（14）得雅可比矩阵为 <span class="math display">\[
+\pmb{J} =
+\begin{bmatrix}
+-s_1(L_2c_2+L_3c_{23})-c_1(D_2+D_3) &amp;-c_1(L_2s_2+L_3s_{23})
+&amp;-L_3c_1s_{23}\\
+c_1(L_2c_2+L_3c_{23})-s_1(D_2+D_3) &amp;-s_1(L_2s_2+L_3s_{23})
+&amp;-L_3s_1s_{23}\\
+0 &amp;-L_2c_2-L_3c_{23} &amp;-L_3c_{23}\\
+\end{bmatrix}
+\tag{15}
+\]</span></p>
+<p><em>当然，雅可比的计算也可用代码完成，如下所示：</em></p>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><code class="hljs matlab"><span class="hljs-comment">% 1. 计算末坐标系相对于初坐标系的变换矩阵</span><br><span class="hljs-comment">% 2. 在初坐标系中描述末坐标系的原点</span><br><span class="hljs-comment">% 3. 计算雅可比矩阵</span><br><span class="hljs-comment">% @filename: mian.m</span><br><br>clc,clear,close all;<br>syms th1 th2 th3;<br>syms l1 l2 l3;<br>syms d1 d2 d3;<br>syms PI;<br><br>T01 = generate_T(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, th1);<br>T12 = generate_T(-PI/<span class="hljs-number">2</span>, <span class="hljs-number">0</span>, d2, th2);<br>T23 = generate_T(<span class="hljs-number">0</span>, l2, d3, th3);<br>T34 = generate_T(<span class="hljs-number">0</span>, l3, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>);<br><br>P = T01*T12*T23*T34;<br>P = subs(P,PI,<span class="hljs-built_in">pi</span>);<br>P_simplify = simplify(P)<br><br>pos = P_simplify(<span class="hljs-number">1</span>:<span class="hljs-number">3</span>, <span class="hljs-number">4</span>)<br><br>jacobian(pos, [th1, th2, th3])<br><br></code></pre></td></tr></table></figure>
+<h4 id="假设虚拟力">2.1.4 假设虚拟力</h4>
+<p>假设用一个虚拟构件（弹簧阻尼器）连接机械臂末端和外界，将该虚拟构件产生的作用在机械臂末端点的虚拟力记为<span
+class="math inline">\(F\)</span>，可将虚拟力<span
+class="math inline">\(F\)</span>分解到三个方向，即 <span
+class="math display">\[
+\pmb{F} =
+\begin{bmatrix}
+F_x\\
+F_y\\
+F_z\\
+\end{bmatrix}
+=
+\begin{bmatrix}
+k_x &amp;0 &amp;0\\
+0 &amp;k_y &amp;0\\
+0 &amp;0 &amp;k_z\\
+\end{bmatrix}
+\begin{bmatrix}
+x_d - x\\
+y_d - y\\
+z_d - z\\
+\end{bmatrix}
++
+\begin{bmatrix}
+b_x &amp;0 &amp;0\\
+0 &amp;b_y &amp;0\\
+0 &amp;0 &amp;b_z\\
+\end{bmatrix}
+\begin{bmatrix}
+\dot{x_d} - \dot{x}\\
+\dot{y_d} - \dot{y}\\
+\dot{z_d} - \dot{z}\\
+\end{bmatrix}
+\tag{16}
+\]</span></p>
+<h4 id="求解扭矩">2.1.5 求解扭矩</h4>
+<p>将式（15）、（16）代入式（6）可得关节力矩。</p>
+<h4 id="代码">2.1.6 代码</h4>
+<p><a
+target="_blank" rel="noopener" href="https://github.com/HuShanzhi/demo_quadruped_VMC">demo_quadruped_VMC</a></p>
+<h2 id="参考">3 参考</h2>
+<p>四足机器人对角小跑步态虚拟模型直觉控制方法研究</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>虚拟模型控制</div>
+      <div>https://hushanzhi.github.io/2023/05/07/虚拟模型控制/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>HuShanzhi</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2023年5月7日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2025/08/17/pid%E6%8E%A7%E5%88%B6%E5%99%A8/" title="pid控制器">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">pid控制器</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2023/05/04/%E5%89%8D%E8%A8%80/" title="前言">
+                        <span class="hidden-mobile">前言</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  
+      <script>
+        if (!window.MathJax) {
+          window.MathJax = {
+            tex    : {
+              inlineMath: { '[+]': [['$', '$']] }
+            },
+            loader : {
+              load: ['ui/lazy']
+            },
+            options: {
+              renderActions: {
+                insertedScript: [200, () => {
+                  document.querySelectorAll('mjx-container').forEach(node => {
+                    let target = node.parentNode;
+                    if (target.nodeName.toLowerCase() === 'li') {
+                      target.parentNode.classList.add('has-jax');
+                    }
+                  });
+                }, '', false]
+              }
+            }
+          };
+        } else {
+          MathJax.startup.document.state(0);
+          MathJax.texReset();
+          MathJax.typeset();
+          MathJax.typesetPromise();
+        }
+
+        Fluid.events.registerRefreshCallback(function() {
+          if ('MathJax' in window && MathJax.startup.document && typeof MathJax.startup.document.state === 'function') {
+            MathJax.startup.document.state(0);
+            MathJax.texReset();
+            MathJax.typeset();
+            MathJax.typesetPromise();
+          }
+        });
+      </script>
+    
+
+  <script  src="https://lib.baomitu.com/mathjax/3.2.2/es5/tex-mml-chtml.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
