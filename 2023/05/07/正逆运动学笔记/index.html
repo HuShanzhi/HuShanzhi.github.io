@@ -1,0 +1,1275 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/flag.png">
+  <link rel="icon" href="/img/flag.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="HuShanzhi">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="Rotation Matrix 旋转矩阵的作用：  描述物体的姿态； 将point由某一个frame的表述换到另一个和此frame有相对转动的frame上来表述； ...  Homogeneous Transformation Matrix 齐次变换矩阵... Forward Kinematics 什么是正运动学 正运动学就是通过关节的驱动来推出机器末端的位姿。 建立关节坐标系 建立坐标系的方法有">
+<meta property="og:type" content="article">
+<meta property="og:title" content="正逆运动学笔记">
+<meta property="og:url" content="https://hushanzhi.github.io/2023/05/07/%E6%AD%A3%E9%80%86%E8%BF%90%E5%8A%A8%E5%AD%A6%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:site_name" content="恒心居">
+<meta property="og:description" content="Rotation Matrix 旋转矩阵的作用：  描述物体的姿态； 将point由某一个frame的表述换到另一个和此frame有相对转动的frame上来表述； ...  Homogeneous Transformation Matrix 齐次变换矩阵... Forward Kinematics 什么是正运动学 正运动学就是通过关节的驱动来推出机器末端的位姿。 建立关节坐标系 建立坐标系的方法有">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://hushanzhi.github.io/2023/05/07/%E6%AD%A3%E9%80%86%E8%BF%90%E5%8A%A8%E5%AD%A6%E7%AC%94%E8%AE%B0/%E6%AD%A3%E9%80%86%E8%BF%90%E5%8A%A8%E5%AD%A6%E7%AC%94%E8%AE%B0/%E6%9C%BA%E6%A2%B0%E6%89%8B%E8%87%82%E5%87%A0%E4%BD%95%E6%8F%8F%E8%BF%B0%E6%96%B9%E5%BC%8F%E7%A4%BA%E6%84%8F%E5%9B%BE-5420114.png">
+<meta property="og:image" content="https://hushanzhi.github.io/2023/05/07/%E6%AD%A3%E9%80%86%E8%BF%90%E5%8A%A8%E5%AD%A6%E7%AC%94%E8%AE%B0/%E6%AD%A3%E9%80%86%E8%BF%90%E5%8A%A8%E5%AD%A6%E7%AC%94%E8%AE%B0/%E5%BB%BA%E7%AB%8B%E5%85%B3%E8%8A%82%E5%9D%90%E6%A0%87%E7%B3%BB-5420114.png">
+<meta property="og:image" content="https://hushanzhi.github.io/2023/05/07/%E6%AD%A3%E9%80%86%E8%BF%90%E5%8A%A8%E5%AD%A6%E7%AC%94%E8%AE%B0/%E6%AD%A3%E9%80%86%E8%BF%90%E5%8A%A8%E5%AD%A6%E7%AC%94%E8%AE%B0/Link0%E5%BB%BA%E7%AB%8B%E5%9D%90%E6%A0%87%E7%B3%BB-5420114.png">
+<meta property="og:image" content="https://hushanzhi.github.io/2023/05/07/%E6%AD%A3%E9%80%86%E8%BF%90%E5%8A%A8%E5%AD%A6%E7%AC%94%E8%AE%B0/%E6%AD%A3%E9%80%86%E8%BF%90%E5%8A%A8%E5%AD%A6%E7%AC%94%E8%AE%B0/Linkn%E5%BB%BA%E7%AB%8B%E5%9D%90%E6%A0%87%E7%B3%BB-5420114.png">
+<meta property="og:image" content="https://hushanzhi.github.io/2023/05/07/%E6%AD%A3%E9%80%86%E8%BF%90%E5%8A%A8%E5%AD%A6%E7%AC%94%E8%AE%B0/%E6%AD%A3%E9%80%86%E8%BF%90%E5%8A%A8%E5%AD%A6%E7%AC%94%E8%AE%B0/%E4%B8%A4%E4%B8%AA%E6%9D%86%E4%BB%B6%E5%9D%90%E6%A0%87%E7%B3%BB%E8%BD%AC%E5%8C%96%E8%BF%87%E7%A8%8B%E7%A4%BA%E6%84%8F%E5%9B%BE-5420114.png">
+<meta property="og:image" content="https://hushanzhi.github.io/2023/05/07/%E6%AD%A3%E9%80%86%E8%BF%90%E5%8A%A8%E5%AD%A6%E7%AC%94%E8%AE%B0/%E6%AD%A3%E9%80%86%E8%BF%90%E5%8A%A8%E5%AD%A6%E7%AC%94%E8%AE%B0/%E4%BA%8C%E8%BF%9E%E6%9D%86%E7%A4%BA%E6%84%8F%E5%9B%BE-5420114.png">
+<meta property="og:image" content="https://hushanzhi.github.io/2023/05/07/%E6%AD%A3%E9%80%86%E8%BF%90%E5%8A%A8%E5%AD%A6%E7%AC%94%E8%AE%B0/%E6%AD%A3%E9%80%86%E8%BF%90%E5%8A%A8%E5%AD%A6%E7%AC%94%E8%AE%B0/%E4%BA%8C%E8%BF%9E%E6%9D%86%E5%BB%BA%E7%AB%8B%E5%85%B3%E8%8A%82%E5%9D%90%E6%A0%87%E7%B3%BB-5420114.png">
+<meta property="og:image" content="https://hushanzhi.github.io/2023/05/07/%E6%AD%A3%E9%80%86%E8%BF%90%E5%8A%A8%E5%AD%A6%E7%AC%94%E8%AE%B0/%E6%AD%A3%E9%80%86%E8%BF%90%E5%8A%A8%E5%AD%A6%E7%AC%94%E8%AE%B0/%E4%BA%8C%E8%BF%9E%E6%9D%86%E9%80%86%E8%BF%90%E5%8A%A8%E5%AD%A6-5420114.png">
+<meta property="og:image" content="https://hushanzhi.github.io/2023/05/07/%E6%AD%A3%E9%80%86%E8%BF%90%E5%8A%A8%E5%AD%A6%E7%AC%94%E8%AE%B0/%E6%AD%A3%E9%80%86%E8%BF%90%E5%8A%A8%E5%AD%A6%E7%AC%94%E8%AE%B0/%E4%BA%8C%E8%BF%9E%E6%9D%86%E9%80%86%E8%BF%90%E5%8A%A8%E5%AD%A6%E5%87%A0%E4%BD%95%E6%B1%82%E8%A7%A3%E6%B3%95-5420114.png">
+<meta property="article:published_time" content="2023-05-07T12:00:01.000Z">
+<meta property="article:modified_time" content="2025-08-17T08:48:55.389Z">
+<meta property="article:author" content="HuShanzhi">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://hushanzhi.github.io/2023/05/07/%E6%AD%A3%E9%80%86%E8%BF%90%E5%8A%A8%E5%AD%A6%E7%AC%94%E8%AE%B0/%E6%AD%A3%E9%80%86%E8%BF%90%E5%8A%A8%E5%AD%A6%E7%AC%94%E8%AE%B0/%E6%9C%BA%E6%A2%B0%E6%89%8B%E8%87%82%E5%87%A0%E4%BD%95%E6%8F%8F%E8%BF%B0%E6%96%B9%E5%BC%8F%E7%A4%BA%E6%84%8F%E5%9B%BE-5420114.png">
+  
+  
+  
+  <title>正逆运动学笔记 - 恒心居</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"hushanzhi.github.io","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>恒心居</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/banner.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="正逆运动学笔记"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2023-05-07 20:00" pubdate>
+          2023年5月7日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          13k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          105 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">正逆运动学笔记</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h2 id="rotation-matrix">Rotation Matrix</h2>
+<p>旋转矩阵的作用：</p>
+<ol type="1">
+<li>描述物体的姿态；</li>
+<li>将point由某一个frame的表述换到另一个和此frame有相对转动的frame上来表述；</li>
+<li>...</li>
+</ol>
+<h2 id="homogeneous-transformation-matrix">Homogeneous Transformation
+Matrix</h2>
+<p>齐次变换矩阵...</p>
+<h2 id="forward-kinematics">Forward Kinematics</h2>
+<h3 id="什么是正运动学">什么是正运动学</h3>
+<p>正运动学就是通过关节的驱动来推出机器末端的位姿。</p>
+<h3 id="建立关节坐标系">建立关节坐标系</h3>
+<p>建立坐标系的方法有两种：一种是<strong>克雷格（Craig
+Version）</strong>；<del>另一种是<strong>Standard</strong></del>。</p>
+<figure>
+<img src="正逆运动学笔记/机械手臂几何描述方式示意图-5420114.png" srcset="/img/loading.gif" lazyload
+alt="图1 机械手臂几何描述方式示意图" />
+<figcaption aria-hidden="true">图1
+机械手臂几何描述方式示意图</figcaption>
+</figure>
+<p>如图1所示，对于一个关节（无论是转动关节还是移动关节），总能找到一个关节轴，记为Axis。当然对于转动关节，Axis就是转轴；对于移动关节，Axis就是移动轴。两个相邻的Axis之间有两种情况：一种是异面直线，一种是共面且平行直线。所以，两个相邻的Axis之间一定存在一条直线。</p>
+<p>如图1所示，对于一个由Joint和Link复合的一个机械结构，一般通过4个参数进行描述<span
+class="math inline">\(\alpha、a、d、\theta\)</span>。其中，<span
+class="math inline">\(\alpha\)</span>表示两个Joint转轴之间的角度，<span
+class="math inline">\(a\)</span>表示两个转轴之间的距离，<span
+class="math inline">\(d\)</span>表示两个Link之间的偏移值，<span
+class="math inline">\(\theta\)</span>表示Joint的转动角度。（<span
+class="math inline">\(\alpha_i, a_i, d_i,
+\theta_i\)</span>）可以用来表示第i个Joint的信息。对于转动关节来说，它的<span
+class="math inline">\(\theta\)</span>是可变参数；对于移动关节来说，它的<span
+class="math inline">\(d\)</span>是可变参数。</p>
+<p>如图2所示，需要给每个Joint建立坐标系（<span
+class="math inline">\(\widehat{X}_i, \widehat{Y}_i,
+\widehat{Z}_i\)</span>），其中，<span
+class="math inline">\(\widehat{Z}_i\)</span>沿转轴Axis（转动或移动）的方向。<span
+class="math inline">\(\widehat{X}_i\)</span>有两种情况：一是当<span
+class="math inline">\(a_i \neq 0\)</span>时，它沿着<span
+class="math inline">\(a_i\)</span>的方向；二是当<span
+class="math inline">\(a_i = 0\)</span>时，它与<span
+class="math inline">\(\widehat{Z}_i和\)</span><span
+class="math inline">\(\widehat{Z}_{i+1}\)</span>两者垂直（i.e. 它为<span
+class="math inline">\(\widehat{Z}_i和\)</span><span
+class="math inline">\(\widehat{Z}_{i+1}\)</span>的叉积的单位向量）。<span
+class="math inline">\(\widehat{Y}_i\)</span>与<span
+class="math inline">\(\widehat{X}_i和\)</span><span
+class="math inline">\(\widehat{Z}_{i}\)</span>两者垂直，且遵循右手定则，即<span
+class="math inline">\(\widehat{Y}_i = \widehat{Z}_{i} \times
+\widehat{X}_{i}\)</span>。<strong>注意Z和X的顺序。</strong></p>
+<figure>
+<img src="正逆运动学笔记/建立关节坐标系-5420114.png" srcset="/img/loading.gif" lazyload
+alt="图2 建立关节坐标系" />
+<figcaption aria-hidden="true">图2 建立关节坐标系</figcaption>
+</figure>
+<p>上述为普遍地建立坐标系的方法。此外，还有两种特殊情况：一是对于地杆Link
+0，为了简化计算，<strong>一般都将Link 1的坐标系作为Link
+0的坐标系。</strong>如果Joint 1是转动关节，则把<span
+class="math inline">\(\theta_1 = 0\)</span>时的Link 1的坐标系作为Link
+0的坐标系；如果Joint 1是移动关节，则把<span class="math inline">\(d_1  =
+0\)</span>时的Link 1的坐标系作为Link 0的坐标系。二是对于最后一个Link
+n，Joint n无法确定一个<span
+class="math inline">\(a_n\)</span>，进而无法确定<span
+class="math inline">\(\widehat{X}_n\)</span>。一般的解决办法是让<span
+class="math inline">\(\theta_n=0\)</span>时的<span
+class="math inline">\(\widehat{X}_n\)</span>的方向与<span
+class="math inline">\(\widehat{X}_{n-1}\)</span>保持相同（<del>【注】：我感觉是从末端向Axis
+n做垂线，然后用垂线来确定<span
+class="math inline">\(\widehat{X}_n\)</span></del>）。</p>
+<figure>
+<img src="正逆运动学笔记/Link0建立坐标系-5420114.png" srcset="/img/loading.gif" lazyload
+alt="图3 Link 0建立坐标系" />
+<figcaption aria-hidden="true">图3 Link 0建立坐标系</figcaption>
+</figure>
+<figure>
+<img src="正逆运动学笔记/Linkn建立坐标系-5420114.png" srcset="/img/loading.gif" lazyload
+alt="图4 Link n建立坐标系" />
+<figcaption aria-hidden="true">图4 Link n建立坐标系</figcaption>
+</figure>
+<h3 id="杆件之间的变换矩阵">杆件之间的变换矩阵</h3>
+<p><span class="math display">\[
+^{i-1}P = ^{i-1}_iT^iP \tag{1}
+\]</span></p>
+<p><img src="正逆运动学笔记/两个杆件坐标系转化过程示意图-5420114.png" srcset="/img/loading.gif" lazyload
+alt="图5 两个杆件坐标系转化过程示意图" /> <span class="math display">\[
+^{i-1}P = ^{i-1}_RT ^R_QT ^Q_PT ^P_iT ^iP \tag{2}
+\]</span></p>
+<p><span class="math display">\[
+^{i-1}_iT =^{i-1}_RT ^R_QT ^Q_PT ^P_iT \\
+= T_{\widehat{X}_{i-1}}(\alpha_{i-1})
+T_{\widehat{X}_{R}}(a_{i-1})  T_{\widehat{Z}_{Q}}(\theta_{i})
+T_{\widehat{Z}_{P}}(d_{i}) \\
+=
+  \begin{bmatrix}
+  cos\theta_i&amp;-sin\theta_i&amp;0&amp;a_{i-1}\\
+cos\alpha_{i-1} sin\theta_i&amp;cos\alpha_{i-1}
+cos\theta_i&amp;sin\alpha_{i-1} &amp;d_isin\alpha_{i-1} \\
+-sin\alpha_{i-1} sin\theta_i&amp;-sin\alpha_{i-1}
+cos\theta_i&amp;cos\alpha_{i-1} &amp;d_icos\alpha_{i-1} \\
+0&amp;0&amp;0&amp;1\\
+  \end{bmatrix} \\
+  \tag{3}
+\]</span></p>
+<p><del><code>【注】式（3）的结果和林沛群教授课件上的不同，个人感觉是他出错了。</code></del></p>
+<p><code>【注】式（3）有误，应为式（3b）。林是对的。</code> <span
+class="math display">\[
+^{i-1}_iT =^{i-1}_RT ^R_QT ^Q_PT ^P_iT \\
+= T_{\widehat{X}_{i-1}}(\alpha_{i-1})
+T_{\widehat{X}_{R}}(a_{i-1})  T_{\widehat{Z}_{Q}}(\theta_{i})
+T_{\widehat{Z}_{P}}(d_{i}) \\
+=
+  \begin{bmatrix}
+  cos\theta_i&amp;-sin\theta_i&amp;0&amp;a_{i-1}\\
+cos\alpha_{i-1} sin\theta_i&amp;cos\alpha_{i-1}
+cos\theta_i&amp;-sin\alpha_{i-1} &amp;-d_isin\alpha_{i-1} \\
+sin\alpha_{i-1} sin\theta_i&amp;sin\alpha_{i-1}
+cos\theta_i&amp;cos\alpha_{i-1} &amp;d_icos\alpha_{i-1} \\
+0&amp;0&amp;0&amp;1\\
+  \end{bmatrix} \\
+  \tag{3b}
+\]</span></p>
+<p><span class="math display">\[
+T_{\widehat{X}_{i-1}}(\alpha_{i-1}) =
+\begin{bmatrix}
+&amp;&amp;&amp;0\\
+&amp;R_{\widehat{X}_{i-1}}(\alpha_{i-1})&amp;&amp;0\\
+&amp;&amp;&amp;0\\
+0&amp;0&amp;0&amp;1\\
+\end{bmatrix} \\
+=
+  \begin{bmatrix}
+1&amp;0&amp;0&amp;0\\
+0&amp;cos\alpha_{i-1}&amp;sin\alpha_{i-1}&amp;0\\
+0&amp;-sin\alpha_{i-1}&amp;cos\alpha_{i-1}&amp;0\\
+0&amp;0&amp;0&amp;1\\
+  \end{bmatrix} \\
+  \tag{4}
+\]</span></p>
+<p><code>【注】式（3）的错误是由式（4）的错误引起的，式（4）应为式（4b）。但是，目前还不知道为什么是式（4b）。</code></p>
+<blockquote>
+<p>现在解释一下为什么是 4b 而不是 4：（<strong>这是因为 Rotation Matrix
+部分没学好。</strong>）</p>
+<p>我们从 <span class="math inline">\(\widehat{X}_{i-1}\)</span>
+的方向向 <span class="math inline">\(\widehat{X}_{i-1}\)</span>
+的负方向看去，坐标系 <span class="math inline">\(\{i-1\}\)</span> 绕
+<span class="math inline">\(\widehat{X}\)</span>
+轴<strong>顺时针</strong>旋转 <span
+class="math inline">\(\alpha\)</span> 度获得坐标系 <span
+class="math inline">\(\{R\}\)</span> 。然后，将坐标系 <span
+class="math inline">\(\{R\}\)</span> 的 <span
+class="math inline">\(\widehat{Z}_R\)</span> 和 <span
+class="math inline">\(\widehat{Y}_R\)</span> 轴依次向坐标系 <span
+class="math inline">\(\{i-1\}\)</span>
+做投影，应该是获得式（4）而不是式（4b），<strong>但是</strong>，<span
+class="math inline">\(\alpha\)</span>
+角是有方向的，顺时针旋转为负。因此，式（4）应该改为： <span
+class="math display">\[
+T_{\widehat{X}_{i-1}}(-\alpha_{i-1}) =
+\begin{bmatrix}
+&amp;&amp;&amp;0\\
+&amp;R_{\widehat{X}_{i-1}}(-\alpha_{i-1})&amp;&amp;0\\
+&amp;&amp;&amp;0\\
+0&amp;0&amp;0&amp;1\\
+\end{bmatrix} \\
+=
+\begin{bmatrix}
+1&amp;0&amp;0&amp;0\\
+0&amp;cos(-\alpha_{i-1})&amp;sin(-\alpha_{i-1})&amp;0\\
+0&amp;-sin(-\alpha_{i-1})&amp;cos(-\alpha_{i-1})&amp;0\\
+0&amp;0&amp;0&amp;1\\
+\end{bmatrix} \\
+\]</span></p>
+<p>做三角变换可得到式 （4b）。</p>
+</blockquote>
+<p><span class="math display">\[
+T_{\widehat{X}_{i-1}}(\alpha_{i-1}) =
+\begin{bmatrix}
+&amp;&amp;&amp;0\\
+&amp;R_{\widehat{X}_{i-1}}(\alpha_{i-1})&amp;&amp;0\\
+&amp;&amp;&amp;0\\
+0&amp;0&amp;0&amp;1\\
+\end{bmatrix} \\
+=
+  \begin{bmatrix}
+1&amp;0&amp;0&amp;0\\
+0&amp;cos\alpha_{i-1}&amp;-sin\alpha_{i-1}&amp;0\\
+0&amp;sin\alpha_{i-1}&amp;cos\alpha_{i-1}&amp;0\\
+0&amp;0&amp;0&amp;1\\
+  \end{bmatrix} \\
+  \tag{4b}
+\]</span></p>
+<p><span class="math display">\[
+T_{\widehat{X}_{R}}(a_{i-1}) =
+\begin{bmatrix}
+1&amp;0&amp;0&amp;\\
+0&amp;1&amp;0&amp;P_{\widehat{X}_{R}}(a_{i-1})\\
+0&amp;0&amp;1&amp;\\
+0&amp;0&amp;0&amp;1\\
+\end{bmatrix} \\
+=
+  \begin{bmatrix}
+  1&amp;0&amp;0&amp;a_{i-1}\\
+0&amp;1&amp;0&amp;0\\
+0&amp;0&amp;1&amp;0\\
+0&amp;0&amp;0&amp;1\\
+  \end{bmatrix} \\
+  \tag{5}
+\]</span></p>
+<p><span class="math display">\[
+T_{\widehat{Z}_{Q}}(\theta_{i})=
+\begin{bmatrix}
+&amp;&amp;&amp;0\\
+&amp;R_{\widehat{Z}_{Q}}(\theta_{i})&amp;&amp;0\\
+&amp;&amp;&amp;0\\
+0&amp;0&amp;0&amp;1\\
+\end{bmatrix} \\
+=
+  \begin{bmatrix}
+cos\theta_{i}&amp;-sin\theta_{i}&amp;0&amp;0\\
+sin\theta_{i}&amp;cos\theta_{i}&amp;0&amp;0\\
+0&amp;0&amp;1&amp;0\\
+0&amp;0&amp;0&amp;1\\
+  \end{bmatrix} \\
+  \tag{6}
+\]</span></p>
+<p><span class="math display">\[
+T_{\widehat{Z}_{P}}(d_{i})  =
+\begin{bmatrix}
+1&amp;0&amp;0&amp;\\
+0&amp;1&amp;0&amp;P_{\widehat{Z}_{P}}(d_{i})\\
+0&amp;0&amp;1&amp;\\
+0&amp;0&amp;0&amp;1\\
+\end{bmatrix} \\
+=
+  \begin{bmatrix}
+  1&amp;0&amp;0&amp;0\\
+0&amp;1&amp;0&amp;0\\
+0&amp;0&amp;1&amp;d_{i}\\
+0&amp;0&amp;0&amp;1\\
+  \end{bmatrix} \\
+  \tag{7}
+\]</span></p>
+<p>进一步，第一个杆件和最后一个杆件之间的变换矩阵为式（8）。</p>
+<p><span class="math display">\[
+^{0}_nT = ^{0}_1T^{1}_2T^{2}_3T ... ^{n-2}_{n-1}T^{n-1}_{n}T    \tag{8}
+\]</span></p>
+<h3 id="instance">Instance</h3>
+<p>我们通过一个简单的二连杆进行一次正运动学推导。</p>
+<figure>
+<img src="正逆运动学笔记/二连杆示意图-5420114.png" srcset="/img/loading.gif" lazyload
+alt="图6 二连杆示意图" />
+<figcaption aria-hidden="true">图6 二连杆示意图</figcaption>
+</figure>
+<p>给图中二连杆的各个关节建立坐标系。</p>
+<blockquote>
+<p>【分析】：</p>
+<ul>
+<li>给Joint 1建立坐标系（即第1个坐标系）：</li>
+</ul>
+<ol type="1">
+<li><p>Joint 1 和 Joint 2 的转轴Axis垂直于平面，且相互平行。因此，<span
+class="math inline">\(\alpha_1=0\)</span>，<span
+class="math inline">\(a_1=\{link1的长度\}\)</span>；</p></li>
+<li><p><span class="math inline">\(\widehat{X_1}\)</span>的方向沿<span
+class="math inline">\(a_1\)</span>，<span
+class="math inline">\(\widehat{Z_1}\)</span>的方向设为沿Joint1
+的转轴向外，进而，可得<span class="math inline">\(\widehat{Y_1} =
+\widehat{X_1}  \times \widehat{Z_1}\)</span>。</p></li>
+</ol>
+<ul>
+<li>给基座建立坐标系（即第0个坐标系）：</li>
+</ul>
+<ol type="1">
+<li>把<span
+class="math inline">\(\theta_1=0\)</span>时的第1个坐标系作为第0个坐标系。</li>
+</ol>
+<ul>
+<li>给Joint 2建立坐标系（即第2个坐标系）：</li>
+</ul>
+<ol type="1">
+<li>首先最关键的是要确定<span
+class="math inline">\(\widehat{X_2}\)</span>的方向。将<span
+class="math inline">\(\widehat{X_1}\)</span>的方向作为<span
+class="math inline">\(\theta_2=0\)</span>时的<span
+class="math inline">\(\widehat{X_2}\)</span>的方向；</li>
+<li><span class="math inline">\(\widehat{Z_2}\)</span>的方向设为沿Joint2
+的转轴向外，进而，可得<span class="math inline">\(\widehat{Y_2} =
+\widehat{X_2}  \times \widehat{Z_2}\)</span>。</li>
+</ol>
+</blockquote>
+<figure>
+<img src="正逆运动学笔记/二连杆建立关节坐标系-5420114.png" srcset="/img/loading.gif" lazyload
+alt="图7 二连杆建立关节坐标系" />
+<figcaption aria-hidden="true">图7 二连杆建立关节坐标系</figcaption>
+</figure>
+<table>
+<thead>
+<tr class="header">
+<th><span class="math inline">\(i\)</span></th>
+<th><span class="math inline">\(\alpha_{i-1}\)</span></th>
+<th><span class="math inline">\(a_{i-1}\)</span></th>
+<th><span class="math inline">\(d_i\)</span></th>
+<th><span class="math inline">\(\theta_{i}\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td><span class="math inline">\(\theta_1\)</span></td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>0</td>
+<td><span class="math inline">\(L_1\)</span></td>
+<td>0</td>
+<td><span class="math inline">\(\theta_2\)</span></td>
+</tr>
+</tbody>
+</table>
+<p>记二连杆的末端点为<span class="math inline">\(P\)</span>，令<span
+class="math inline">\(P\)</span>在 Joint 2 的坐标系下的位置为<span
+class="math inline">\(^2P = (L_2, 0,
+0)^T\)</span>。假设基坐标系为世界坐标系。 <span class="math display">\[
+\begin{bmatrix}
+&amp; \\
+^0P \\
+&amp; \\
+1 \\
+  \end{bmatrix}  
+= ^0_1T ^1_2T
+\begin{bmatrix}
+&amp; \\
+^2P \\
+&amp; \\
+1 \\
+  \end{bmatrix}  
+\tag{9}
+\]</span></p>
+$$ ^0P =
+<span class="math display">\[\begin{bmatrix}
+cos\theta_1&amp;-sin\theta_1&amp;0&amp;a_{0}\\
+cos\alpha_{0} sin\theta_1&amp;cos\alpha_{0}
+cos\theta_1&amp;sin\alpha_{0} &amp;d_1sin\alpha_{0} \\
+-sin\alpha_{0} sin\theta_1&amp;-sin\alpha_{0}
+cos\theta_1&amp;cos\alpha_{0} &amp;d_1cos\alpha_{0} \\
+0&amp;0&amp;0&amp;1\\
+  \end{bmatrix}\]</span>
+<pre><code class="hljs">\begin&#123;bmatrix&#125;</code></pre>
+<p>cos<em>2&amp;-sin<em>2&amp;0&amp;a</em>{1}\ cos</em>{1}
+sin<em>2&amp;cos</em>{1} cos<em>2&amp;sin</em>{1} &amp;d_2sin<em>{1} \
+-sin</em>{1} sin<em>2&amp;-sin</em>{1} cos<em>2&amp;cos</em>{1}
+&amp;d_2cos_{1} \ 0&amp;0&amp;0&amp;1\ \end{bmatrix}</p>
+{^2P} \ =
+<span class="math display">\[\begin{bmatrix}
+cos\theta_1&amp;-sin\theta_1&amp;0&amp;0\\
+sin\theta_1&amp;cos\theta_1&amp;0 &amp;0 \\
+0&amp;0&amp;1 &amp;0 \\
+0&amp;0&amp;0&amp;1\\
+  \end{bmatrix}\]</span>
+<pre><code class="hljs">\begin&#123;bmatrix&#125;</code></pre>
+cos_2&amp;-sin<em>2&amp;0&amp;L</em>{1}\ sin_2&amp;cos_2&amp;0 &amp;0 \
+0&amp;0&amp;1 &amp;0 \ 0&amp;0&amp;0&amp;1\ \end{bmatrix}<br />
+{^2P} \ =
+<span class="math display">\[\begin{bmatrix}
+cos\theta_{1}cos\theta_2-sin\theta_{1}sin\theta_{2}&amp;-cos\theta_{1}sin\theta_2-sin\theta_{1}cos\theta_{2}&amp;0&amp;L_{1}cos\theta_{1}\\
+sin\theta_1cos\theta_{2}+cos\theta_{1}sin\theta_{2}&amp;-sin\theta_{1}sin\theta_{2}+cos\theta_{1}cos\theta_2&amp;0
+&amp;L_1sin\theta_{1} \\
+0&amp;0&amp;1 &amp;0 \\
+0&amp;0&amp;0&amp;1\\
+  \end{bmatrix}\]</span>
+<pre><code class="hljs">  \begin&#123;bmatrix&#125;</code></pre>
+L_{2}\ 0 \ 0 \ 1\ \end{bmatrix} \ =
+<span class="math display">\[\begin{bmatrix}
+(cos\theta_{1}cos\theta_2-sin\theta_{1}sin\theta_{2})L_2+L_{1}cos\theta_{1}\\
+(sin\theta_1cos\theta_{2}+cos\theta_{1}sin\theta_{2})L_2+L_1sin\theta_{1}
+\\
+0 \\
+1\\
+  \end{bmatrix}\]</span>
+\ =
+<span class="math display">\[\begin{bmatrix}
+cos(\theta_{1}+\theta_{2})L_2+L_{1}cos\theta_{1}\\
+sin(\theta_{1}+\theta_{2})L_2+L_1sin\theta_{1} \\
+0 \\
+1\\
+  \end{bmatrix}\]</span>
+<p> $$</p>
+<h2 id="inverse-kinematics">Inverse Kinematics</h2>
+<p>### 什么是逆运动学</p>
+<p>逆运动学就是通过机器末端的位姿来反推各个关节的驱动。</p>
+<h3 id="求解方法">求解方法</h3>
+<ul>
+<li>解析法
+<ul>
+<li>代数和几何方法</li>
+</ul></li>
+<li>数值法
+<ul>
+<li>用计算机试值</li>
+</ul></li>
+<li>目前大多数机械臂设计成具有解析解
+<ul>
+<li>对于一个六轴机械臂，设计时让它的相邻三轴相交一点，一般这样的手臂就能找到解析解。目前，机械臂多将后三个轴相交一点。</li>
+</ul></li>
+</ul>
+<h3 id="instance-1">Instance</h3>
+<figure>
+<img src="正逆运动学笔记/二连杆逆运动学-5420114.png" srcset="/img/loading.gif" lazyload
+alt="图8 二连杆逆运动学" />
+<figcaption aria-hidden="true">图8 二连杆逆运动学</figcaption>
+</figure>
+假设基坐标系为世界坐标系。令<span
+class="math inline">\(P\)</span>为目标点，已知<span
+class="math inline">\(P\)</span>点在世界坐标系的坐标为<span
+class="math inline">\((x, y, z)=(x, y, 0)\)</span>，进而可以推出Joint
+2坐标系原点的坐标为<span class="math inline">\((x-L_2cos\varphi,
+y-L_2sin\varphi, 0)\)</span>，因此Joint
+2坐标系相对于世界坐标系的变换矩阵<span
+class="math inline">\(^0_2T\)</span>可以表示为 $$
+<span class="math display">\[\begin{bmatrix}
+cos\varphi&amp;-sin\varphi&amp;0&amp;x-L_2cos\varphi\\
+sin\varphi&amp;cos\varphi&amp;0&amp;y-L_2sin\varphi \\
+0&amp;0&amp;1&amp;0 \\
+0&amp;0&amp;0&amp;1\\
+  \end{bmatrix}\]</span>
+<span class="math display">\[
+根据正运动学公式$^0_2T$还可以表示为
+\]</span>
+<span class="math display">\[\begin{bmatrix}
+cos\theta_{1}cos\theta_2-sin\theta_{1}sin\theta_{2}&amp;-cos\theta_{1}sin\theta_2-sin\theta_{1}cos\theta_{2}&amp;0&amp;L_{1}cos\theta_{1}\\
+sin\theta_1cos\theta_{2}+cos\theta_{1}sin\theta_{2}&amp;-sin\theta_{1}sin\theta_{2}+cos\theta_{1}cos\theta_2&amp;0
+&amp;L_1sin\theta_{1} \\
+0&amp;0&amp;1 &amp;0 \\
+0&amp;0&amp;0&amp;1\\
+  \end{bmatrix}\]</span>
+<span class="math display">\[
+根据三角公式进一步化简得
+\]</span>
+<span class="math display">\[\begin{bmatrix}
+cos(\theta_{1}+\theta_2)&amp;-sin(\theta_1+\theta_{2})&amp;0&amp;L_{1}cos\theta_{1}\\
+sin(\theta_1+\theta_{2})&amp;cos(\theta_{1}+\theta_{2})&amp;0
+&amp;L_1sin\theta_{1} \\
+0&amp;0&amp;1 &amp;0 \\
+0&amp;0&amp;0&amp;1\\
+  \end{bmatrix}\]</span>
+<p> $$</p>
+<h4 id="代数法">代数法</h4>
+<p>联立式（11）和（13）得 <span class="math display">\[
+\begin{cases}
+cos\varphi= cos(\theta_1+\theta_2)\\
+sin\varphi= sin(\theta_1+\theta_2)\\
+x-L_2cos\varphi=L_1cos\theta_1\\
+y-L_2sin\varphi=L_1sin\theta_1\\
+\end{cases}
+\tag{14}
+\]</span></p>
+<p><span class="math display">\[
+\begin{cases}
+x= L_1cos\theta_1 + L_2cos(\theta_1+\theta_2)\\
+y= L_1sin\theta_1 + L_2sin(\theta_1+\theta_2)\\
+\end{cases}
+\tag{15}
+\]</span></p>
+<p><span class="math display">\[
+x^2 + y^2 = L_1^2 + L_2^2 + 2L_1L_2[cos\theta_1cos(\theta_1+\theta_2) +
+sin\theta_1sin(\theta_1+\theta_2)] \\
+x^2 + y^2 = L_1^2 + L_2^2 + 2L_1L_2cos\theta_2
+\tag{16}
+\]</span></p>
+<p><span class="math display">\[
+\theta_2 = \pm arccos(\frac{x^2+y^2-L_1^2-L_2^2}{2L_1L_2})
+\]</span></p>
+<p><span class="math display">\[
+\begin{cases}
+x= L_1cos\theta_1 + L_2cos(\theta_1+\theta_2) =
+(L_1+L_2cos\theta_2)cos\theta_1+(-L_2sin\theta_2)sin\theta_1\\
+y= L_1sin\theta_1 + L_2sin(\theta_1+\theta_2) =
+(L_1+L_2cos\theta_2)sin\theta_1 + (\, \, \, \,
+\,  L_2sin\theta_2)cos\theta_1\\
+\end{cases}
+\tag{17}
+\]</span></p>
+<p><span class="math display">\[
+\begin{cases}
+x \triangleq k_1cos\theta_1 - k_2sin\theta_1 \\
+y \triangleq k_1sin\theta_1 + k_2cos\theta_1\\
+\end{cases}
+\tag{18}
+\]</span></p>
+<p><span class="math display">\[
+r = + \sqrt{k_1^2+k_2^2} \\
+\gamma=arctan(k_2/k_1)
+\tag{19}
+\]</span></p>
+<p><span class="math display">\[
+k_1 = r cos\gamma \\
+k_2 = r sin\gamma
+\tag{20}
+\]</span></p>
+<p><span class="math display">\[
+\begin{cases}
+\frac{x}{r} = cos\gamma cos\theta_1 - sin\gamma sin\theta_1 = cos(\gamma
++ \theta_1) \\
+\frac{y}{r} = cos\gamma sin\theta_1 - sin\gamma cos\theta_1 = sin(\gamma
++ \theta_1)
+\end{cases}
+\tag{21}
+\]</span></p>
+<p><span class="math display">\[
+tan(\gamma + \theta_1) = y/x \\
+\theta_1 = arctan(y/x) - \gamma =  arctan(y/x) - arctan(k_2/k_1)
+\tag{22}
+\]</span></p>
+<h4 id="几何法">几何法</h4>
+<figure>
+<img src="正逆运动学笔记/二连杆逆运动学几何求解法-5420114.png" srcset="/img/loading.gif" lazyload
+alt="图9 二连杆逆运动学几何求解法" />
+<figcaption aria-hidden="true">图9 二连杆逆运动学几何求解法</figcaption>
+</figure>
+<p>连接<span class="math inline">\(P\)</span>点和基坐标系原点，记为<span
+class="math inline">\(L_0\)</span>，<span class="math inline">\(L_0 =
+\sqrt{x^2+y^2}\)</span>。对三角形<span
+class="math inline">\(\bigtriangleup_{L_0L_1L_2}\)</span>做一个余弦定理得
+<span class="math display">\[
+L_0^2 = L_1^2 + L_2^2 - 2L_1L_2cos(\pi-\theta_2)
+\tag{23}
+\]</span> 进而，解得 <span class="math display">\[
+cos\theta_2=\frac{x^2+y^2-L_1^2-L_2^2}{2L_1L_2}
+\\
+\theta_2 = \pm arccos(\frac{x^2+y^2-L_1^2-L_2^2}{2L_1L_2})
+\tag{24}
+\]</span> 由于<span
+class="math inline">\(\varphi\)</span>的限制，上式中<span
+class="math inline">\(\theta_2\)</span>应取正值。然后，可求出<span
+class="math inline">\(\theta_1\)</span>为：<span
+class="math inline">\(\theta_1 = \varphi - \theta_2\)</span>。</p>
+<h2 id="matlab验证">MATLAB验证</h2>
+<h3 id="验证正运动学">验证正运动学</h3>
+<p>二连杆采用Modified DH创建的DH表如下：</p>
+<table>
+<thead>
+<tr class="header">
+<th><span class="math inline">\(i\)</span></th>
+<th><span class="math inline">\(\alpha_{i-1}\)</span></th>
+<th><span class="math inline">\(a_{i-1}\)</span></th>
+<th><span class="math inline">\(d_i\)</span></th>
+<th><span class="math inline">\(\theta_{i}\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td><span class="math inline">\(\theta_1=\pi/2\)</span></td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>0</td>
+<td><span class="math inline">\(L_1=5\)</span></td>
+<td>0</td>
+<td><span class="math inline">\(\theta_2 = -\pi/2\)</span></td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>0</td>
+<td><span class="math inline">\(L_2=3\)</span></td>
+<td>0</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+<p>利用Robotics System
+Toolbox求解正运动学（这里作为标准答案检验我们的矩阵公式法求解的结果是否为真）</p>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs matlab"><span class="hljs-comment">% 使用的版本是matlab 2021b.</span><br><span class="hljs-comment">% 利用Robotics System Toolbox对平面二连杆进行正运动学计算.</span><br><span class="hljs-comment">% 利用改进D-H（MDH）法建立多轴机器人</span><br>clc;<br>clear;<br>L(<span class="hljs-number">1</span>)=Link(<span class="hljs-string">&#x27;d&#x27;</span>, <span class="hljs-number">0</span>, <span class="hljs-string">&#x27;a&#x27;</span>, <span class="hljs-number">0</span>, <span class="hljs-string">&#x27;alpha&#x27;</span>, <span class="hljs-number">0</span>,<span class="hljs-string">&#x27;offset&#x27;</span>,<span class="hljs-built_in">pi</span>/<span class="hljs-number">2</span>,<span class="hljs-string">&#x27;modified&#x27;</span>);<br>L(<span class="hljs-number">2</span>)=Link(<span class="hljs-string">&#x27;d&#x27;</span>, <span class="hljs-number">0</span>, <span class="hljs-string">&#x27;a&#x27;</span>, <span class="hljs-number">5</span>, <span class="hljs-string">&#x27;alpha&#x27;</span>, <span class="hljs-number">0</span>,<span class="hljs-string">&#x27;offset&#x27;</span>,-<span class="hljs-built_in">pi</span>/<span class="hljs-number">2</span>,<span class="hljs-string">&#x27;modified&#x27;</span>);<br>L(<span class="hljs-number">3</span>)=Link(<span class="hljs-string">&#x27;d&#x27;</span>, <span class="hljs-number">0</span>, <span class="hljs-string">&#x27;a&#x27;</span>, <span class="hljs-number">3</span>, <span class="hljs-string">&#x27;alpha&#x27;</span>, <span class="hljs-number">0</span>,<span class="hljs-string">&#x27;offset&#x27;</span>,<span class="hljs-number">0</span>,<span class="hljs-string">&#x27;modified&#x27;</span>);<br><br>robot = SerialLink( L,<span class="hljs-string">&#x27;name&#x27;</span>,<span class="hljs-string">&#x27;平面二连杆&#x27;</span>) ; <br><br>robot.display();<span class="hljs-comment">% 展示出机器人的信息</span><br>view(<span class="hljs-number">3</span>)<br>teach(robot);<span class="hljs-comment">% 调出示教滑块</span><br><br></code></pre></td></tr></table></figure>
+<figure>
+<img
+src="正逆运动学笔记/利用Robotics%20System%20Toolbox的正运动学求解结果-5420114.png" srcset="/img/loading.gif" lazyload
+alt="图10 利用Robotics System Toolbox的正运动学求解结果" />
+<figcaption aria-hidden="true">图10 利用Robotics System
+Toolbox的正运动学求解结果</figcaption>
+</figure>
+<p>可以看到末端点的坐标为<span class="math inline">\([3, 5,
+0]\)</span>。</p>
+<p>利用矩阵公式求解正运动学</p>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs matlab"><span class="hljs-comment">% 用于生成一个变换矩阵.</span><br><span class="hljs-comment">% file: generate_T.m</span><br><span class="hljs-comment">% 函数名: generate_T.</span><br><span class="hljs-comment">% Args: </span><br><span class="hljs-comment">%   alpha, a, d, theta.</span><br><span class="hljs-comment">% Return:</span><br><span class="hljs-comment">%   T.</span><br><br><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">T</span> = <span class="hljs-title">generate_T</span><span class="hljs-params">(alpha, a, d, theta)</span></span><br><span class="hljs-comment">% 这里的T矩阵是式（3b）的矩阵</span><br>T = [<span class="hljs-built_in">cos</span>(theta) -<span class="hljs-built_in">sin</span>(theta) <span class="hljs-number">0</span> a;<br>         <span class="hljs-built_in">cos</span>(alpha)*<span class="hljs-built_in">sin</span>(theta) <span class="hljs-built_in">cos</span>(alpha)*<span class="hljs-built_in">cos</span>(theta) -<span class="hljs-built_in">sin</span>(alpha) -d*<span class="hljs-built_in">sin</span>(alpha);<br>         <span class="hljs-built_in">sin</span>(alpha)*<span class="hljs-built_in">sin</span>(theta) <span class="hljs-built_in">sin</span>(alpha)*<span class="hljs-built_in">cos</span>(theta) <span class="hljs-built_in">cos</span>(alpha) d*<span class="hljs-built_in">cos</span>(alpha);<br>         <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">1</span>];<br></code></pre></td></tr></table></figure>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs matlab"><span class="hljs-comment">% 使用的版本是matlab 2021b.</span><br><span class="hljs-comment">% file: forward_kinematics_formula.m</span><br><span class="hljs-comment">% 利用矩阵公式对平面二连杆进行正运动学计算.</span><br><span class="hljs-comment">% 利用改进D-H（MDH）法建立多轴机器人</span><br>T1 = generate_T(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-built_in">pi</span>/<span class="hljs-number">2</span>);<br>T2 = generate_T(<span class="hljs-number">0</span>, <span class="hljs-number">5</span>, <span class="hljs-number">0</span>, -<span class="hljs-built_in">pi</span>/<span class="hljs-number">2</span>);<br>T3 = generate_T(<span class="hljs-number">0</span>, <span class="hljs-number">3</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>);<br><br>P = T1*T2*T3<br></code></pre></td></tr></table></figure>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs matlab">运行结果：<br>&gt;&gt; forward_kinematics_formula<br><br>P =<br><br>    <span class="hljs-number">1.0000</span>         <span class="hljs-number">0</span>         <span class="hljs-number">0</span>    <span class="hljs-number">3.0000</span><br>         <span class="hljs-number">0</span>    <span class="hljs-number">1.0000</span>         <span class="hljs-number">0</span>    <span class="hljs-number">5.0000</span><br>         <span class="hljs-number">0</span>         <span class="hljs-number">0</span>    <span class="hljs-number">1.0000</span>         <span class="hljs-number">0</span><br>         <span class="hljs-number">0</span>         <span class="hljs-number">0</span>         <span class="hljs-number">0</span>    <span class="hljs-number">1.0000</span><br></code></pre></td></tr></table></figure>
+<p>可以看到末端点的坐标也为<span class="math inline">\([3, 5,
+0]\)</span>。</p>
+<h3 id="验证逆运动学">验证逆运动学</h3>
+<p>利用Robotics System Toolbox对平面二连杆进行逆运动学计算</p>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><code class="hljs matlab"><span class="hljs-comment">% 使用的版本是matlab 2021b.</span><br><span class="hljs-comment">% file: inverse_kinematics_RT.m</span><br><span class="hljs-comment">% 利用Robotics System Toolbox对平面二连杆进行逆运动学计算.</span><br><span class="hljs-comment">% 利用改进D-H（MDH）法建立多轴机器人</span><br><span class="hljs-comment">% clc;</span><br>clear;<br>L(<span class="hljs-number">1</span>)=Link(<span class="hljs-string">&#x27;d&#x27;</span>, <span class="hljs-number">0</span>, <span class="hljs-string">&#x27;a&#x27;</span>, <span class="hljs-number">0</span>, <span class="hljs-string">&#x27;alpha&#x27;</span>, <span class="hljs-number">0</span>,<span class="hljs-string">&#x27;offset&#x27;</span>,<span class="hljs-number">0</span>,<span class="hljs-string">&#x27;modified&#x27;</span>);<br>L(<span class="hljs-number">2</span>)=Link(<span class="hljs-string">&#x27;d&#x27;</span>, <span class="hljs-number">0</span>, <span class="hljs-string">&#x27;a&#x27;</span>, <span class="hljs-number">5</span>, <span class="hljs-string">&#x27;alpha&#x27;</span>, <span class="hljs-number">0</span>,<span class="hljs-string">&#x27;offset&#x27;</span>,<span class="hljs-number">0</span>,<span class="hljs-string">&#x27;modified&#x27;</span>);<br>L(<span class="hljs-number">3</span>)=Link(<span class="hljs-string">&#x27;d&#x27;</span>, <span class="hljs-number">0</span>, <span class="hljs-string">&#x27;a&#x27;</span>, <span class="hljs-number">3</span>, <span class="hljs-string">&#x27;alpha&#x27;</span>, <span class="hljs-number">0</span>,<span class="hljs-string">&#x27;offset&#x27;</span>,<span class="hljs-number">0</span>,<span class="hljs-string">&#x27;modified&#x27;</span>);<br><br>robot = SerialLink( L,<span class="hljs-string">&#x27;name&#x27;</span>,<span class="hljs-string">&#x27;平面二连杆&#x27;</span>) ; <br><br><span class="hljs-comment">%% 普通机器人的示教展示</span><br><span class="hljs-comment">% robot.display();% 展示出机器人的信息</span><br>view(<span class="hljs-number">3</span>)<br>teach(robot);<span class="hljs-comment">% 调出示教滑块</span><br><br><span class="hljs-comment">%% 机器人的正解函数</span><br><br>theta=[<span class="hljs-built_in">pi</span>/<span class="hljs-number">4</span>,-<span class="hljs-built_in">pi</span>/<span class="hljs-number">3</span>, <span class="hljs-number">0</span>];<br>robot.<span class="hljs-built_in">plot</span>(theta);<br>p=robot.fkine(theta)<br><br><span class="hljs-comment">%% 机器人的逆解</span><br>mask = [<span class="hljs-number">1</span> <span class="hljs-number">1</span> <span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>];<br>q=ikine(robot,p,<span class="hljs-string">&#x27;mask&#x27;</span>,mask)<br>robot.<span class="hljs-built_in">plot</span>(q);<span class="hljs-comment">%输出机器人模型，后面的三个角为输出时的theta姿态</span><br><br></code></pre></td></tr></table></figure>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs matlab">运行结果：<br>&gt;&gt; inverse_kinematics_RT<br> <br>p = <br>    <span class="hljs-number">0.9659</span>    <span class="hljs-number">0.2588</span>         <span class="hljs-number">0</span>     <span class="hljs-number">6.433</span><br>   <span class="hljs-number">-0.2588</span>    <span class="hljs-number">0.9659</span>         <span class="hljs-number">0</span>     <span class="hljs-number">2.759</span><br>         <span class="hljs-number">0</span>         <span class="hljs-number">0</span>         <span class="hljs-number">1</span>         <span class="hljs-number">0</span><br>         <span class="hljs-number">0</span>         <span class="hljs-number">0</span>         <span class="hljs-number">0</span>         <span class="hljs-number">1</span><br><br>q =<br><br>    <span class="hljs-number">0.0249</span>    <span class="hljs-number">1.0472</span>         <span class="hljs-number">0</span><br></code></pre></td></tr></table></figure>
+<p>利用矩阵公式求解逆运动学</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>正逆运动学笔记</div>
+      <div>https://hushanzhi.github.io/2023/05/07/正逆运动学笔记/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>HuShanzhi</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2023年5月7日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2023/05/07/%E8%99%9A%E6%8B%9F%E6%A8%A1%E5%9E%8B%E6%8E%A7%E5%88%B6/" title="虚拟模型控制">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">虚拟模型控制</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2023/05/04/%E5%89%8D%E8%A8%80/" title="前言">
+                        <span class="hidden-mobile">前言</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  
+      <script>
+        if (!window.MathJax) {
+          window.MathJax = {
+            tex    : {
+              inlineMath: { '[+]': [['$', '$']] }
+            },
+            loader : {
+              load: ['ui/lazy']
+            },
+            options: {
+              renderActions: {
+                insertedScript: [200, () => {
+                  document.querySelectorAll('mjx-container').forEach(node => {
+                    let target = node.parentNode;
+                    if (target.nodeName.toLowerCase() === 'li') {
+                      target.parentNode.classList.add('has-jax');
+                    }
+                  });
+                }, '', false]
+              }
+            }
+          };
+        } else {
+          MathJax.startup.document.state(0);
+          MathJax.texReset();
+          MathJax.typeset();
+          MathJax.typesetPromise();
+        }
+
+        Fluid.events.registerRefreshCallback(function() {
+          if ('MathJax' in window && MathJax.startup.document && typeof MathJax.startup.document.state === 'function') {
+            MathJax.startup.document.state(0);
+            MathJax.texReset();
+            MathJax.typeset();
+            MathJax.typesetPromise();
+          }
+        });
+      </script>
+    
+
+  <script  src="https://lib.baomitu.com/mathjax/3.2.2/es5/tex-mml-chtml.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
