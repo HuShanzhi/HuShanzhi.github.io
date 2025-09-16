@@ -31,7 +31,7 @@
 <meta property="og:image" content="https://hushanzhi.github.io/2025/09/16/%E5%8A%A8%E6%80%81%E7%9F%A9%E9%98%B5%E6%8E%A7%E5%88%B6/%E5%8A%A8%E6%80%81%E7%9F%A9%E9%98%B5%E6%8E%A7%E5%88%B6%E7%9A%84%E7%AE%97%E6%B3%95%E7%BB%93%E6%9E%84-8008603.png">
 <meta property="og:image" content="https://hushanzhi.github.io/2025/09/16/%E5%8A%A8%E6%80%81%E7%9F%A9%E9%98%B5%E6%8E%A7%E5%88%B6/%E6%97%A0%E7%BA%A6%E6%9D%9F%E5%8A%A8%E6%80%81%E7%9F%A9%E9%98%B5%E6%8E%A7%E5%88%B6%E7%9A%84%E5%9C%A8%E7%BA%BF%E8%AE%A1%E7%AE%97%E6%B5%81%E7%A8%8B-8008603.png">
 <meta property="article:published_time" content="2025-09-16T07:42:41.000Z">
-<meta property="article:modified_time" content="2025-09-16T07:46:27.952Z">
+<meta property="article:modified_time" content="2025-09-16T08:33:24.997Z">
 <meta property="article:author" content="LiuJiaming">
 <meta property="article:tag" content="算法">
 <meta name="twitter:card" content="summary_large_image">
@@ -363,7 +363,7 @@ class="math inline">\(\Delta{u(k)}\)</span> 是在 <span
 class="math inline">\(k\)</span>
 时刻对系统施加的信号，其是一个标量。</p>
 <p><img src="输入增量预测输出-8008603.png" srcset="/img/loading.gif" lazyload alt="图4 输入增量预测输出" width="100%"></p>
-如图 4 所示，如果系统被施加的控制增量在 <span
+<p>如图 4 所示，如果系统被施加的控制增量在 <span
 class="math inline">\(k\)</span> 时刻之后（含 <span
 class="math inline">\(k\)</span> 时刻）的 <span
 class="math inline">\(M\)</span> 个采样间隔都变化，为 <span
@@ -387,36 +387,33 @@ a_{i-j+1} \Delta u(k+j-1) + , \ i=1,...,P
 \]</span> 转化为向量/矩阵形式为： <span class="math display">\[
 \pmb{\tilde y}_M(k) = \pmb{\tilde y}_0(k) + \pmb{A} \ \Delta{\pmb{u}(k)}
 \tag{6}
-\]</span> 即 $$
-<span class="math display">\[\begin{pmatrix}
+\]</span> 即 <span class="math display">\[
+\begin{pmatrix}
 \tilde y_M(k+1\mid k) \\
 \tilde y_M(k+2\mid k) \\
 \vdots \\
 \tilde y_M(k+P\mid k)
-\end{pmatrix}\]</span>
-<h1 id="p">_{P }</h1>
-<span class="math display">\[\begin{pmatrix}
+\end{pmatrix}_{P \times 1} =
+\begin{pmatrix}
 \tilde y_0(k+1\mid k) \\
 \tilde y_0(k+2\mid k) \\
 \vdots \\
 \tilde y_0(k+P\mid k)
-\end{pmatrix}\]</span>
-_{P } +
-<span class="math display">\[\begin{pmatrix}
+\end{pmatrix}_{P \times 1} +
+\begin{pmatrix}
 a_1 &amp; 0 &amp; 0 &amp; \cdots &amp; 0\\
 a_2 &amp; a_1 &amp; 0 &amp; \cdots &amp; 0\\
 a_3 &amp; a_2 &amp; a_1 &amp; \cdots &amp; 0\\
 \vdots &amp; \vdots &amp; \vdots &amp;   &amp; \vdots\\
 a_P &amp; a_{P-1} &amp; a_{P-2} &amp; \cdots &amp; a_{P-M+1}
-\end{pmatrix}\]</span>
-<p>_{P M}</p>
-<span class="math display">\[\begin{pmatrix}
+\end{pmatrix}_{P \times M}
+\begin{pmatrix}
 \Delta u(k) \\
 \Delta u(k+1) \\
 \vdots \\
 \Delta u(k+M-1)
-\end{pmatrix}\]</span>
-<p>_{M } $$ 其中，<span class="math inline">\(\pmb A\)</span>
+\end{pmatrix}_{M \times 1}
+\]</span> 其中，<span class="math inline">\(\pmb A\)</span>
 被称为动态矩阵。<span class="math inline">\(M\)</span>
 为控制时域长度，<span class="math inline">\(P\)</span>
 为优化时域长度，通常 <span class="math inline">\(M\)</span> 和 <span
@@ -498,15 +495,19 @@ class="math inline">\(\pmb{\Delta u}(k)\)</span> 可通过极值必要条件
 <li>证明式（10）：（二次型的求导）</li>
 </ul>
 <p><span class="math display">\[
+\begin{aligned}
+&amp;\quad \quad \quad \quad \quad \quad \quad \quad \quad
 \frac{dJ(k)}{d \pmb{\Delta u}(k)} = 0 \\
-\Rightarrow - 2 \pmb{A}^T \pmb{Q} [\ \pmb{\omega}(k)- \pmb{\tilde
+&amp;\Rightarrow - 2 \pmb{A}^T \pmb{Q} [\ \pmb{\omega}(k)- \pmb{\tilde
 y}_0(k) - \pmb A \ \Delta{\pmb{u}(k)} \ ] + 2 \pmb{R} \ \pmb{\Delta
 u}(k) = 0 \\
-\Rightarrow 2(\pmb{A}^T \pmb{Q} \pmb{A} + \pmb{R}) \pmb{\Delta u}(k) = 2
-\pmb{A}^T \pmb{Q} [\ \pmb{\omega}(k)- \pmb{\tilde y}_0(k) \ ]\\
-\Rightarrow \pmb{\Delta u}(k) = (\pmb{A}^T \pmb{Q} \pmb{A} +
+&amp;\Rightarrow 2(\pmb{A}^T \pmb{Q} \pmb{A} + \pmb{R}) \pmb{\Delta
+u}(k) = 2 \pmb{A}^T \pmb{Q} [\ \pmb{\omega}(k)- \pmb{\tilde y}_0(k) \
+]\\
+&amp;\Rightarrow \pmb{\Delta u}(k) = (\pmb{A}^T \pmb{Q} \pmb{A} +
 \pmb{R})^{-1} \pmb{A}^T \pmb{Q} [\ \pmb{\omega}(k)- \pmb{\tilde y}_0(k)
 \ ]
+\end{aligned}
 \]</span></p>
 </blockquote>
 <p>公式（10）给出了 <span class="math inline">\(k\)</span>
