@@ -1,0 +1,58 @@
+<mxfile host="Electron" modified="2025-09-16T06:14:51.897Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/23.1.5 Chrome/120.0.6099.109 Electron/28.1.0 Safari/537.36" etag="TFhxMzHT5mdIRK_YOcAE" version="23.1.5" type="device">
+  <diagram name="第 1 页" id="6MnDnmoGnUS4yCd519d_">
+    <mxGraphModel dx="1194" dy="727" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="1169" pageHeight="827" math="1" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="tcNd-8XgJhyFCkH_7gRw-10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" parent="1" source="tcNd-8XgJhyFCkH_7gRw-1" target="tcNd-8XgJhyFCkH_7gRw-4" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="tcNd-8XgJhyFCkH_7gRw-1" value="入口" style="rounded=1;whiteSpace=wrap;html=1;arcSize=50;" parent="1" vertex="1">
+          <mxGeometry x="360" y="30" width="80" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="tcNd-8XgJhyFCkH_7gRw-2" value="返回" style="rounded=1;whiteSpace=wrap;html=1;arcSize=50;" parent="1" vertex="1">
+          <mxGeometry x="360" y="680" width="80" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="tcNd-8XgJhyFCkH_7gRw-12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" parent="1" source="tcNd-8XgJhyFCkH_7gRw-4" target="tcNd-8XgJhyFCkH_7gRw-5" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="tcNd-8XgJhyFCkH_7gRw-4" value="检测实际输出&amp;nbsp; &amp;nbsp;并计算误差&lt;br&gt;$$y-y(1) \rightarrow e$$" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="280" y="99" width="240" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="tcNd-8XgJhyFCkH_7gRw-13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="tcNd-8XgJhyFCkH_7gRw-5" target="tcNd-8XgJhyFCkH_7gRw-6" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="tcNd-8XgJhyFCkH_7gRw-5" value="预测值矫正&lt;br&gt;$$y(i)+h_ie\rightarrow y(i), i = 1,2,...,N&lt;br&gt;$$" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="280" y="190" width="240" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="tcNd-8XgJhyFCkH_7gRw-14" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" parent="1" source="tcNd-8XgJhyFCkH_7gRw-6" target="tcNd-8XgJhyFCkH_7gRw-7" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="tcNd-8XgJhyFCkH_7gRw-6" value="移位设置该时刻初值&lt;br&gt;$$y(i+1) \rightarrow y(i), i = 1,2,...,N-1&lt;br&gt;$$" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="280" y="280" width="240" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="tcNd-8XgJhyFCkH_7gRw-15" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" parent="1" source="tcNd-8XgJhyFCkH_7gRw-7" target="tcNd-8XgJhyFCkH_7gRw-8" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="tcNd-8XgJhyFCkH_7gRw-7" value="计算控制增量&lt;br&gt;$$\sum_{i-1}^P d_i(w-y(i)) \rightarrow \Delta u&lt;br&gt;$$" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="280" y="370" width="240" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="tcNd-8XgJhyFCkH_7gRw-16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" parent="1" source="tcNd-8XgJhyFCkH_7gRw-8" target="tcNd-8XgJhyFCkH_7gRw-9" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="tcNd-8XgJhyFCkH_7gRw-8" value="计算控制量并输出&lt;br&gt;$$u + \Delta u \rightarrow u$$" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="320" y="500" width="160" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="tcNd-8XgJhyFCkH_7gRw-17" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" parent="1" source="tcNd-8XgJhyFCkH_7gRw-9" target="tcNd-8XgJhyFCkH_7gRw-2" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="tcNd-8XgJhyFCkH_7gRw-9" value="计算输出预测值&lt;br&gt;$$y(i) + a_i \Delta u \rightarrow y(i), i = 1,2,...,N&lt;br&gt;$$" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="280" y="590" width="240" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="tcNd-8XgJhyFCkH_7gRw-11" value="$$y$$" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+          <mxGeometry x="380" y="95" width="51" height="26" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
